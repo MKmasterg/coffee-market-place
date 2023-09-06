@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block title %}Editing market{% endblock title %}
+{% block content %}
+    <h1>Market modification</h1>
+    <form method="POST">
+    {% csrf_token %} 
+    {% for field in form %}
+        <p>
+            {{field.errors}}
+            {{ field.label_tag }}<br>
+            {{ field }}
+            {% if field.help_text%}
+                <small style="color: grey">{{ field.help_text }}</small>
+            {% endif %}
+        </p>
+        {%endfor%}
+        
+        <br><button type="submit">Modify</button>
+    </form>
+    <button return false onclick="document.location='{% url 'main' %}' ">main page</button>
+{% endblock content %}

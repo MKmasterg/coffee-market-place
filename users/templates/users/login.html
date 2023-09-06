@@ -1,0 +1,25 @@
+{% extends 'base.html' %}
+
+{% block title %}Login{% endblock  %}
+
+{% block content %}
+    {%if user.is_authenticated%}
+    <h1>Your are already signed in!<a href="{%url 'main'%}">back to main</a>|<a href="{%url 'users:logout'%}">logout</a></h1>
+    {%else%}
+            <h1>Please login to proceed</h1>
+            <form method="POST">
+               {% csrf_token %} 
+               <label for="id_username">Username:</label><br>
+               <input type="text" name="username" maxlength="150" autofocus="" required="" id="id_username">
+               <br>
+               <label for="id_password">Password:</label><br>
+               <input type="password" name="password" autocomplete="new-password" required id="id_password"><br>
+               <button type="submit">login</button>
+            </form>
+            <button onclick="document.location='{%url 'users:signup'%}'">Signup</button>
+            {% if error %} 
+                <p style="{color:red}">{{error}}</p>
+            {% endif %}
+            <br><a return false href="{%url 'main'%}">Main</a>
+    {%endif%}
+{% endblock%}

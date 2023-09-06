@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Customer's address{% endblock  %}
+
+{% block content %}
+    <h1>Please complete to proceed:</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{form}}
+        {% if error %}
+        <p>{{error}}</p>
+        {% endif %}
+        <br><button type="submit">submit</button> 
+    </form>
+{% endblock %}

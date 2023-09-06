@@ -1,0 +1,16 @@
+{% extends 'base.html' %}
+
+{% block title %}Seller assignment{% endblock  %}
+
+{% block content %}
+    <h1>Please complete to proceed:</h1>
+    <form method="POST">
+        {% csrf_token %}
+        {{form}}
+        {% if error %}
+        <p>{{error}}</p>
+        {% endif %}
+        <br><button type="submit">submit</button> 
+    </form>
+    <button return false onclick="document.location='{%url 'users:seller_pf'%}' ">Back</button>
+{% endblock %}

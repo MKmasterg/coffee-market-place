@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+
+{% block title %}Coffee Market Place{% endblock title %}
+
+{% block content %}
+    <h1>Markets:</h1>
+    <hr>
+    {% for market in markets %}
+    {% if market.is_active and market.is_verified %}
+        <div class="marker_element">
+        <h2><a href="{% url 'markets:market_main' market.id%}">{{market}}</a></h2>
+        <p>{{market.desc}}</p>
+        </div>
+        <hr>
+    {% endif %}
+    {% endfor %}
+{% endblock content %}

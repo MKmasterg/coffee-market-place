@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}Index Of Markets{% endblock title %}
+
+{% block content %}
+{% if markets %}
+    <h1>Results:</h1>
+    {% for market in markets %}
+        <h2><a href="{% url 'markets:market_main' market.id%}" >{{market}}</a></h2>
+        <p>{{market.desc}}</p>
+    {% endfor %}
+{% else %}
+    <h1>No Match For Your Keyword</h1>
+{% endif %}
+{% endblock content %}

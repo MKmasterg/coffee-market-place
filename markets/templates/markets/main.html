@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+
+{% block title %}{{market}}{% endblock title %}
+
+{% block content %}
+    <h1>{{market}}
+    {% if supervisor %} | <a href=" {% url 'users:seller_assignment' market.id %} ">assign a seller</a> <a href="{% url 'markets:market_edit' market.id%}">edit</a> <a href="{% url 'markets:market_delete' market.id%}">delete</a>{% endif %}
+    </h1>
+    <h3>{{market.desc}} | {{market.address}} | {{market.phone_number}} | {{market.rate}} | {{market.number_of_orders}} </h3>
+    <h3>
+        {% if supervisor or seller %} <a href="{% url 'markets:stock_registration' market.id%}">Add stock</a>{% endif %}
+    </h3>
+    {% if seller %}
+    <hr>
+    <h2>Orders:</h2>
+    {% if market.order_set.all %}
+    <form method="POST">
+        {% csrf_token %}
+        {% for each in market.order_set.all %}
+        <p>
+            <strong>Id : {{each.id}} | {{each.stock}} 
+                | <a href="{% url 'users:cusotmer_contact_ifo' each.customer.id%}">{{each.customer}}</a>
+                | no : {{each.number_of_stock}}
+                | {{each.date_placed}} | 
+                <label for="stat_drop">Status:</label>
+                <select name="status{{each.id}}" required id="stat_drop">
+                    <option value="200" {% if each.status == 200 %}selected{% endif %} >Delivered</option>
+                    <option value="300" {% if each.status == 300 %}selected{% endif %} >Pending</option>
+                    <option value="403" {% if each.status == 403 %}selected{% endif %} >Declined</option>
+                </select>
+            </strong>  
+        </p>
+        {% endfor %}
+        <input type="submit" value="Submit">
+    </form>
+    {% else %}
+    <p><strong>No orders yet!</strong></p>
+    {% endif %}
+    {% endif %}
+    <hr>
+    <h2>Stocks:</h2>
+    {% for stock in market.stock_set.all %}
+    <p>
+        {% if not supervisor or not seller %}
+        {% if stock.is_available and stock.no != 0 %}
+        <strong>{{stock.name}}</strong><br>
+        <small>{{stock.desc}}</small><br>
+        <strong>{{stock.ppg}}</strong><br>
+        {% if customer and stock not in user.customuser.customer.basket.all %}<a href="{% url 'users:add_to_basket' stock.id%}">Add to basket</a>
+        {% elif customer and stock in user.customuser.customer.basket.all %}<a href="{% url 'users:remove_from_basket' stock.id %}">Remove from basket</a>
+        {% endif %}
+        {% endif %}
+        {% elif supervisor or seller %}
+        <strong>{{stock.name}}</strong><br>
+        <small>{{stock.desc}}</small><br>
+        <strong>{{stock.ppg}}</strong><br>
+        <a href="{% url 'markets:stock_deletion' stock.id%}">remove</a> | <a href="{% url 'markets:stock_modification' stock.id%}">modify</a>
+        <small>| Is available: {{stock.is_available}} | no: {{stock.no}}</small>
+        {% endif %}
+    </p>
+    {% endfor %}
+{% endblock content %}

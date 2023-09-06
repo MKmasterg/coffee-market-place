@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="utf-8">
+        <meta http-equiv="X-UA-Compatible" content="IE=edge">
+        <title>{% block title %}  {% endblock %}</title>
+        <meta name="description" content="">
+        <meta name="viewport" content="width=device-width, initial-scale=1">
+        <link rel="stylesheet" href="">
+    </head>
+    <body>
+
+        <div id="sidebar">
+            {% block sidebar %}
+            <ul>
+                {%if user.is_authenticated%}
+                You are logged in as {{user.username}}
+                    {% if user.customuser.customer %} and your a customer!
+                    {% elif user.customuser.seller %} and your a seller!
+                    {% else %} and you don't have a role, you have to choose a role to use this site
+                        <a href="{% url 'users:customer_sign_up' %}">customer sign up</a>
+                        <a href="{% url 'users:seller_sign_up' %}">seller sign up</a>
+                    {% endif %}
+                
+                {% if user.is_staff %}| you are a staff {% endif %}
+                
+                {% if not user.customuser.seller.markets.all and user.customuser.seller %}
+                    | You are not currently in any markets either request a supervisor to add to their market
+                    or <a href="{% url 'users:create_market' %}">create a market</a>
+                {% endif %}
+                
+                <li><a href="{%url 'users:logout'%}">logout</a></li>
+                {% if user.customuser.seller %}
+                <li><a href="{% url 'users:seller_pf' %}">Profile</a></li>
+                <li><a href="{% url 'users:create_market' %}">Create a market</a></li>
+                {% endif %}
+                {% endif %}
+                {% if not user.is_authenticated %}
+                <li><a href="{% url 'users:signup' %}">Register</a></li>
+                <li><a href="{% url 'users:login' %}">Login</a></li>
+                {% endif %}
+                <li><a href="{% url 'main' %}">Home</a></li>
+                {% if user.customuser.customer %}
+                <li><a href="{% url 'users:customer_pf' %}">Profile</a> | Basket items: {{user.customuser.customer.basket.all|length}} {% if user.customuser.customer.basket.all %}<a href="{% url 'markets:place_order' %}">Place Order</a> {% endif %}</li>
+                {% endif %}
+                
+            </ul>
+            <form method="POST" action="{% url 'markets:search' %}" >
+                {% csrf_token %}
+                <lable for="search_index">Search Through Markets:</lable>
+                <input id="search_index" type="text" name="keyword" placeholder="Search">
+                <input type="submit" value="Search">
+            </form>
+            {% endblock sidebar%}
+        </div>
+
+        <div id="content">
+            <div id="main-messages">
+                {% block messages %}
+                {% if messages %}
+                <ul class="messages">
+                    {% for message in messages %}
+                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                    {% endfor %}
+                </ul>
+                {% endif %}            
+                {% endblock %}
+            </div>
+            {% block content %} {% endblock %}
+        </div>
+
+    </body>
+</html>

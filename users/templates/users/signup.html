@@ -1,0 +1,27 @@
+{% extends 'base.html' %}
+
+{% block title %}Sign up{% endblock  %}
+
+{% block content %}
+    {%if user.is_authenticated%}
+    <h1>Your are already signed in!<a>back to blog</a>|<a>logout</a></h1>
+    {%else%}
+    <h1>Sign up form!</h1>
+    <form method="POST">
+    {% csrf_token %} 
+    {% for field in form %}
+        <p>
+            {{field.errors}}
+            {{ field.label_tag }}<br>
+            {{ field }}
+            {% if field.help_text%}
+                <small style="color: grey">{{ field.help_text }}</small>
+            {% endif %}
+        </p>
+        {%endfor%}
+        
+        <br><button type="submit">register</button>
+    </form>
+    <button return false onclick="document.location='{% url 'main' %}' ">main page</button>
+    {%endif%}
+{% endblock%}

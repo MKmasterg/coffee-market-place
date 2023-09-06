@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block title %}{{seller}}'s profile{% endblock title %}
+
+{% block content %}
+    <h1> {{seller}} | <a href="{% url 'users:update_user' %}">Edit</a></h1>
+    <hr>
+    <h3>Markets:</h3>
+    <div class="markets-list">
+        <ul>
+            {% for market in seller.markets.all %}
+                <p>id: {{market.id}} | <a href="{% url 'markets:market_main' market.id%}" >{{market}}</a></p>
+            {% endfor %}
+        </ul>
+    </div>
+    <hr>
+    <h3>Supervisor:</h3>
+    <div class="supervisor-list">
+        <ul>
+            {% for sup in seller.supervisor.all %}
+                <p>id: {{sup.id}} | <a href="{% url 'markets:market_main' sup.id%}" >{{sup}}</a> | <a href=" {% url 'users:seller_assignment' sup.id %} ">Assign a seller</a>
+                <a href="{% url 'markets:market_edit' sup.id%}">Edit</a>
+                <a href="{% url 'markets:market_delete' sup.id%}">delete</a>
+                |{% if not sup.is_verified %} Waiting for admin's verfication {% endif %}
+                {% if sup.is_active %} Active {% else %} Deactive {% endif %}
+                <p>
+                Sellers:
+                <ul>
+                {% for each in sup.markets_seller_set.all %}
+                {% if not each == seller %}
+                <li>{{each}} <a href="{% url 'users:seller_discharging' each.id sup.id%}">delete</a></li>
+                {% endif %}
+                {% endfor %}
+                </ul>
+                </p>
+                </p>
+            {% endfor %}
+        </ul>
+    </div>
+    <hr>
+    <p><a href="{% url 'users:change_password' %}">Change password</a></p>
+{% endblock content %}

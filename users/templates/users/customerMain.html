@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+
+{% block title %}{{customer.user.user.first_name}}'s profile{% endblock  %}
+
+{% block content %}
+    <h2>{{customer}} | <a href="{% url 'users:update_user' %}">Edit</a></h2>
+    <hr>
+    <h3>Your basket:</h3>
+    {% if customer.basket.all %}
+    {% for each in customer.basket.all %}
+        <p><strong>{{each}}</strong> | <a href="{% url 'users:remove_from_basket' each.id%}">Remove</a>
+         | Availablity : {% if each.is_available %} Available {% else %} Not available {% endif %}
+        </p>
+    {% endfor %}
+    {% else %}
+    <p>Empty!</p>
+    {% endif %}
+    <hr>
+    <h3>Your orders:</h3>
+    {% if customer.order_set.all %}
+    {% for each in customer.order_set.all %}
+    <p>
+        <strong>Id : {{each.id}} | {{each.stock}} | {{each.market}} | no : {{each.number_of_stock}}
+            | {{each.date_placed}} | 
+            {% if each.status == 300 %}Pending{% elif each.status == 200 %}Delivered
+            {% elif each.status == 403 %}Declined{% endif %}
+        </strong>  
+    </p>
+    {% endfor %}
+    {% else %}
+    <p>Empty!</p>
+    {% endif %}
+
+{% endblock %}

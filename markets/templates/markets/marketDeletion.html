@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block title %}market no {{market.id}} deletion{% endblock title %}
+
+{% block content %}
+    <h1> YOU ARE CURRENTLY TRYING TO DELETE MARKET :({{market.id}} | {{market.name}})
+        ARE YOU SURE?</h1>
+    <form method="POST" >
+        {% csrf_token %}
+        <input type="checkbox" id="verfication" name="validation">
+        <label for="verfication"> I am aware of what I am curretnly doing!</label><br>
+        <input type="submit" value="Submit">
+    </form>
+    <button return false onclick="document.location='{% url 'users:seller_pf' %}' ">cancel</button>
+{% endblock content %}

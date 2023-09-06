@@ -1,0 +1,28 @@
+{% extends 'base.html' %}
+
+{% block title %}Place Order{% endblock title %}
+
+{% block content %}
+    <h1>List of items:</h1>
+    <form method="POST">
+        {% csrf_token %}
+        <ul>
+            {% for stock in stocks %}
+                <li><h3>Id: {{stock.id}} |{{stock}}|{{stock.market}}</h3></li>
+                <p>
+                <lable for="id_stock{{stock.id}}">Number of order:</lable>
+                <br>
+                <input type="number" name="stock{{stock.id}}" required id="id_stock{{stock.id}}">
+                <br>
+                <lable for="id_stock_msg{{stock.id}}">Message for seller:</lable>
+                <br>
+                <input type="text" name="msg{{stock.id}}" id="id_stock_msg{{stock.id}}">
+                <br>
+                <a href="{% url 'users:remove_from_basket' stock.id%}">remove</a>
+                </p>
+            {% endfor %}
+        </ul>
+        <button type="submit">Order!</button>
+    </form>
+    <button return false onclick="document.location='/users/customer/' ">Cancel</button>
+{% endblock content %}
