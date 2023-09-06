@@ -5,14 +5,19 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path , include
-from .views import MainPage
-# from django.views.generic import TemplateView
 
+from django.views import View
+from django.shortcuts import render
+from users.models import Market
+
+class MainPage(View):
+    def get(self,request):
+        markets = Market.objects.all() if Market.objects.all() else None
+        return render(request,"main.html/",{"markets":markets})
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('users/',include('users.urls',namespace="users")),
     path('',MainPage.as_view(),name="main"),
-    # path('',TemplateView.as_view(template_name='main.html',extra_context={"markets":markets}),name="main"),
     path('markets/',include('markets.urls',namespace="markets")),
 ]
