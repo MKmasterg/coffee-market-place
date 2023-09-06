@@ -2,7 +2,7 @@
 # CoffeeMarketPlace
 
 A simple coffee market place written with Django!
-# How It Works?
+# How Does It Work?
 This application consists of two sections:
 
  1. Sellers/Supervisors; Who sell products and manage markets
@@ -15,7 +15,7 @@ This application consists of two sections:
  A supervisor's job as mentioned is market management and seller assignment plus sellers' job.  
  
  **Markets:**
- Markets are places for sellers and customers to get in touch and interact.
+ Markets are places for sellers and customers to get in touch and interact; When you first create a market you need Admin's (The superuser of the whole site and the one who can access django's admin site) permission in order to get you're market accessible to users.
  
 **Customers:**
  Customers' job is to buy and place order.
