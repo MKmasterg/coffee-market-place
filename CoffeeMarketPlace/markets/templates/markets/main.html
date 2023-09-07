@@ -21,7 +21,8 @@
             <strong>Id : {{each.id}} | {{each.stock}} 
                 | <a href="{% url 'users:cusotmer_contact_ifo' each.customer.id%}">{{each.customer}}</a>
                 | no : {{each.number_of_stock}}
-                | {{each.date_placed}} | 
+                | {{each.date_placed}} 
+                | {{each.message}} | 
                 <label for="stat_drop">Status:</label>
                 <select name="status{{each.id}}" required id="stat_drop">
                     <option value="200" {% if each.status == 200 %}selected{% endif %} >Delivered</option>

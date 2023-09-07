@@ -26,12 +26,15 @@ class AddToBasket(LoginRequiredMixin,View):
         customer = get_object_or_404(Customer,user=user)
         stock = get_object_or_404(Stock,id=stock_id)
         if not stock in customer.basket.all():
-            customer.basket.add(stock)
+            if stock.is_available:
+                messages.success(request,"Stock added to your basket successfully!")
+                customer.basket.add(stock)
+            else:
+                messages.error(request,"Unauthorized request!")
         else:
             messages.error(request,"Stock is already in your basket!")
             return redirect("markets:market_main",stock.market.id)
-        
-        messages.success(request,"Stock added to your basket successfully!")
+            
         return redirect("markets:market_main",stock.market.id)
 
 class RemoveFromBasket(LoginRequiredMixin,View):

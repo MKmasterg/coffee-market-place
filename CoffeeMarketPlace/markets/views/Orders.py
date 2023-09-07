@@ -35,6 +35,13 @@ class PlaceOrder(LoginRequiredMixin,View):
         for key,value in request.POST.dict().items():
             if "stock" in key:
                 id = int(key[5:])
+                for each in stocks:
+                    if id == each.id:
+                        break
+                else:
+                    messages.error(request,"Something's wrong.")
+                    return render(request,"markets/placeOrder.html",{"stocks":stocks})
+                
                 stock = Stock.objects.get(id=id)
                 if int(value) > stock.no:
                     errors.append(id)
@@ -48,7 +55,7 @@ class PlaceOrder(LoginRequiredMixin,View):
                 if "stock" in key:
                     id = int(key[5:])
                     msg = request.POST.get(f"msg{id}")
-                    if len(msg) <= 200: 
+                    if msg != None and len(msg) <= 200: 
                         stock = Stock.objects.get(id=id)
                         Order.objects.create(
                             stock=stock,
