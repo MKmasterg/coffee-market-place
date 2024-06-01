@@ -1,5 +1,5 @@
 
-# CoffeeMarketPlace
+# Coffee Market Place
 
 A simple coffee market place written with Django!
 # How Does It Work?
