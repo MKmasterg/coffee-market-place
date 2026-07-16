@@ -1,0 +1,63 @@
+name: Deploy to PythonAnywhere
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy on PythonAnywhere
+        env:
+          PA_USERNAME: ${{ secrets.PA_USERNAME }}
+          PA_API_TOKEN: ${{ secrets.PA_API_TOKEN }}
+          PA_DOMAIN: mkmsater.pythonanywhere.com
+        run: |
+          set -euo pipefail
+
+          if [ -z "${PA_USERNAME}" ] || [ -z "${PA_API_TOKEN}" ]; then
+            echo "Missing PA_USERNAME or PA_API_TOKEN GitHub secrets."
+            exit 1
+          fi
+
+          API="https://www.pythonanywhere.com/api/v0/user/${PA_USERNAME}"
+
+          console_id=$(
+            curl -fsS "${API}/consoles/" \
+              -H "Authorization: Token ${PA_API_TOKEN}" \
+            | python3 -c "
+          import json, sys
+          consoles = json.load(sys.stdin)
+          for console in consoles:
+              if console.get('executable') in ('bash', 'sh'):
+                  print(console['id'])
+                  break
+          "
+          )
+
+          if [ -z "${console_id}" ]; then
+            echo "No bash console found. Open one on PythonAnywhere (Consoles → Bash) and re-run."
+            exit 1
+          fi
+
+          deploy_input=$'cd ~/coffee-market-place\ngit pull origin main\nsource ~/.virtualenvs/coffee-env/bin/activate\nset -a; source .env; set +a\npip install -r requirements.txt\npython manage.py migrate\npython manage.py collectstatic --noinput\n'
+
+          payload=$(DEPLOY_INPUT="${deploy_input}" python3 -c '
+          import json, os
+          print(json.dumps({"input": os.environ["DEPLOY_INPUT"]}))
+          ')
+
+          curl -fsS -X POST "${API}/consoles/${console_id}/send_input/" \
+            -H "Authorization: Token ${PA_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            -d "${payload}"
+
+          sleep 45
+
+          curl -fsS -X POST "${API}/webapps/${PA_DOMAIN}/reload/" \
+            -H "Authorization: Token ${PA_API_TOKEN}"
+
+          echo "Deploy finished. Site: https://${PA_DOMAIN}"
