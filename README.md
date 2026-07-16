@@ -1,27 +1,40 @@
-
 # Coffee Market Place
 
-A simple coffee market place written with Django!
-# How Does It Work?
-This application consists of two sections:
+A Django marketplace where sellers/supervisors manage markets and stock, and customers browse and place orders.
 
- 1. Sellers/Supervisors; Who sell products and manage markets
- 2. Customers; Who buy stuff
- 
- You just have to register as either of those and you're good to go!
- 
- **Sellers/Supervisors:**
- When you first register as seller the application suggests either create a market and become a supervisor and the seller of your market yourself or ask from a supervisor you know to assign you as their market's seller; Either way seller's work is to manage orders and stock management.
- A supervisor's job as mentioned is market management and seller assignment plus sellers' job.  
- 
- **Markets:**
- Markets are places for sellers and customers to get in touch and interact; When you first create a market you need Admin's (The superuser of the whole site and the one who can access django's admin site) permission in order to get you're market accessible to users.
- 
-**Customers:**
- Customers' job is to buy and place order.
- 
-**NoRole/BaseUser:**
-Each user after basic registration doesn't have any roles so the application considers them as "NoRole"s or  "BaseUser"s and suggest them to get a role immediately! 
+## Roles
 
-**This application is in state of developing and bugs and vulnerabilities are to be expected, If noticed any please commit.**
-**I also appreciate your commits if you have better and efficient ways of doing things in mind for functions and views of this application**
+- **Seller / Supervisor** — manage stock, orders, and market settings
+- **Customer** — browse markets and place orders
+- **No role** — new users are prompted to pick a role after signup
+
+New markets need admin approval (`is_verified`) before they appear to users.
+
+## Setup
+
+```bash
+python -m venv .venv
+source .venv/bin/activate   # Windows: .venv\Scripts\activate
+pip install -r requirements.txt
+python manage.py migrate
+python manage.py createsuperuser
+python manage.py runserver
+```
+
+Open http://127.0.0.1:8000/
+
+## Project layout
+
+```
+coffee-market-place/
+├── manage.py
+├── CoffeeMarketPlace/   # project settings & URLs
+├── users/               # auth, roles, customers, sellers
+├── markets/             # market pages, stock, orders
+└── templates/           # shared templates
+```
+
+## Notes
+
+- Dev DB is SQLite (`db.sqlite3`) — gitignored; run `migrate` after clone
+- Still in development; contributions welcome
