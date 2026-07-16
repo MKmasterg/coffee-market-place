@@ -1,15 +1,31 @@
 {% extends 'base.html' %}
 
-{% block title %}Index Of Markets{% endblock title %}
+{% block title %}Search results{% endblock %}
 
 {% block content %}
+<div class="page-header">
+    <h1>Search results</h1>
+</div>
+
 {% if markets %}
-    <h1>Results:</h1>
+<div class="market-grid">
     {% for market in markets %}
-        <h2><a href="{% url 'markets:market_main' market.id%}" >{{market}}</a></h2>
-        <p>{{market.desc}}</p>
+    <article class="card card-interactive stagger-item">
+        <div class="card-header">
+            <h2 class="card-title"><a href="{% url 'markets:market_main' market.id %}">{{ market }}</a></h2>
+        </div>
+        <p class="card-desc">{{ market.desc }}</p>
+        <div class="card-meta">
+            <span class="meta-item">{{ market.address }}</span>
+            {% if market.rate %}<span class="meta-item rating">★ {{ market.rate }}/5</span>{% endif %}
+        </div>
+    </article>
     {% endfor %}
+</div>
 {% else %}
-    <h1>No Match For Your Keyword</h1>
+<div class="empty-state">
+    <h2>No match for your keyword</h2>
+    <p>Try a different search term or <a href="{% url 'main' %}">browse all markets</a>.</p>
+</div>
 {% endif %}
-{% endblock content %}
+{% endblock %}

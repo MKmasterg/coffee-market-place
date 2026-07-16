@@ -1,28 +1,40 @@
 {% extends 'base.html' %}
 
-{% block title %}Place Order{% endblock title %}
+{% block title %}Place order{% endblock %}
 
 {% block content %}
-    <h1>List of items:</h1>
-    <form method="POST">
-        {% csrf_token %}
-        <ul>
-            {% for stock in stocks %}
-                <li><h3>Id: {{stock.id}} |{{stock}}|{{stock.market}}</h3></li>
+<div class="page-header">
+    <h1>Your basket</h1>
+    <p>Review items and send your order to the seller.</p>
+</div>
+
+<form method="POST">
+    {% csrf_token %}
+    <div class="stock-list">
+        {% for stock in stocks %}
+        <div class="stock-item">
+            <div class="stock-info">
+                <strong>{{ stock }}</strong>
+                <small>{{ stock.market }}</small>
+                <span class="stock-price">{{ stock.ppg }} / g</span>
+            </div>
+            <div style="flex: 1; min-width: 12rem; max-width: 20rem;">
                 <p>
-                <lable for="id_stock{{stock.id}}">Number of order:</lable>
-                <br>
-                <input type="number" name="stock{{stock.id}}" required id="id_stock{{stock.id}}">
-                <br>
-                <lable for="id_stock_msg{{stock.id}}">Message for seller:</lable>
-                <br>
-                <input type="text" name="msg{{stock.id}}" id="id_stock_msg{{stock.id}}">
-                <br>
-                <a href="{% url 'users:remove_from_basket' stock.id%}">remove</a>
+                    <label for="id_stock{{ stock.id }}">Quantity</label>
+                    <input type="number" name="stock{{ stock.id }}" required id="id_stock{{ stock.id }}" min="1">
                 </p>
-            {% endfor %}
-        </ul>
-        <button type="submit">Order!</button>
-    </form>
-    <button return false onclick="document.location='/users/customer/' ">Cancel</button>
-{% endblock content %}
+                <p>
+                    <label for="id_stock_msg{{ stock.id }}">Message for seller</label>
+                    <input type="text" name="msg{{ stock.id }}" id="id_stock_msg{{ stock.id }}" placeholder="Grind preference, notes…">
+                </p>
+                <a href="{% url 'users:remove_from_basket' stock.id %}" class="btn btn-ghost btn-sm">Remove</a>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Place order</button>
+        <a href="{% url 'users:customer_pf' %}" class="btn btn-secondary">Cancel</a>
+    </div>
+</form>
+{% endblock %}
