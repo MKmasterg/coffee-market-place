@@ -1,27 +1,37 @@
 {% extends 'base.html' %}
 
-{% block title %}Sign up{% endblock  %}
+{% block title %}Sign up{% endblock %}
 
 {% block content %}
-    {%if user.is_authenticated%}
-    <h1>Your are already signed in!<a>back to blog</a>|<a>logout</a></h1>
-    {%else%}
-    <h1>Sign up form!</h1>
+{% if user.is_authenticated %}
+<div class="page-header">
+    <h1>Already signed in</h1>
+    <a href="{% url 'main' %}" class="btn btn-primary">Back to home</a>
+</div>
+{% else %}
+<div class="page-header">
+    <h1>Create your account</h1>
+    <p>Join as a customer to order beans, or as a seller to open your market.</p>
+</div>
+
+<div class="card form-card">
     <form method="POST">
-    {% csrf_token %} 
-    {% for field in form %}
+        {% csrf_token %}
+        {% for field in form %}
         <p>
-            {{field.errors}}
-            {{ field.label_tag }}<br>
+            {{ field.errors }}
+            {{ field.label_tag }}
             {{ field }}
-            {% if field.help_text%}
-                <small style="color: grey">{{ field.help_text }}</small>
+            {% if field.help_text %}
+            <small>{{ field.help_text }}</small>
             {% endif %}
         </p>
-        {%endfor%}
-        
-        <br><button type="submit">register</button>
+        {% endfor %}
+        <div class="form-actions">
+            <button type="submit" class="btn btn-primary">Register</button>
+            <a href="{% url 'main' %}" class="btn btn-ghost">Back to home</a>
+        </div>
     </form>
-    <button return false onclick="document.location='{% url 'main' %}' ">main page</button>
-    {%endif%}
-{% endblock%}
+</div>
+{% endif %}
+{% endblock %}

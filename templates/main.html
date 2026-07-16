@@ -1,17 +1,37 @@
 {% extends 'base.html' %}
 
-{% block title %}Coffee Market Place{% endblock title %}
+{% block title %}Coffee Market Place{% endblock %}
 
 {% block content %}
-    <h1>Markets:</h1>
-    <hr>
+<div class="page-header">
+    <h1>Discover coffee markets</h1>
+    <p>Browse verified roasters, explore their beans, and order straight to your door.</p>
+</div>
+
+{% if markets %}
+<div class="market-grid">
     {% for market in markets %}
     {% if market.is_active and market.is_verified %}
-        <div class="marker_element">
-        <h2><a href="{% url 'markets:market_main' market.id%}">{{market}}</a></h2>
-        <p>{{market.desc}}</p>
+    <article class="card card-interactive stagger-item">
+        <div class="card-header">
+            <h2 class="card-title"><a href="{% url 'markets:market_main' market.id %}">{{ market }}</a></h2>
         </div>
-        <hr>
+        <p class="card-desc">{{ market.desc }}</p>
+        <div class="card-meta">
+            <span class="meta-item">{{ market.address }}</span>
+            {% if market.rate %}
+            <span class="meta-item rating">★ {{ market.rate }}/5</span>
+            {% endif %}
+            <span class="meta-item">{{ market.number_of_orders }} orders</span>
+        </div>
+    </article>
     {% endif %}
     {% endfor %}
-{% endblock content %}
+</div>
+{% else %}
+<div class="empty-state">
+    <h2>No markets yet</h2>
+    <p>Check back soon — roasters are warming up their grinders.</p>
+</div>
+{% endif %}
+{% endblock %}

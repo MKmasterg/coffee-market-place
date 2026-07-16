@@ -1,73 +1,120 @@
+{% load static %}
 <!DOCTYPE html>
-<html>
-    <head>
-        <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <title>{% block title %}  {% endblock %}</title>
-        <meta name="description" content="">
-        <meta name="viewport" content="width=device-width, initial-scale=1">
-        <link rel="stylesheet" href="">
-    </head>
-    <body>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="Discover specialty coffee markets and order fresh beans from local roasters.">
+    <title>{% block title %}Coffee Market Place{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/app.css' %}">
+</head>
+<body>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
 
-        <div id="sidebar">
-            {% block sidebar %}
-            <ul>
-                {%if user.is_authenticated%}
-                You are logged in as {{user.username}}
-                    {% if user.customuser.customer %} and your a customer!
-                    {% elif user.customuser.seller %} and your a seller!
-                    {% else %} and you don't have a role, you have to choose a role to use this site
-                        <a href="{% url 'users:customer_sign_up' %}">customer sign up</a>
-                        <a href="{% url 'users:seller_sign_up' %}">seller sign up</a>
+    <div class="app-shell">
+        <header class="site-header">
+            <a href="{% url 'main' %}" class="brand">
+                <span class="brand-mark" aria-hidden="true">☕</span>
+                <span>
+                    <span class="brand-name">Coffee Market</span>
+                    <span class="brand-tagline">Fresh from local roasters</span>
+                </span>
+            </a>
+            <div class="header-actions">
+                {% if user.is_authenticated %}
+                    {% if user.customuser.customer %}
+                        <a href="{% url 'markets:place_order' %}" class="btn btn-secondary btn-sm">
+                            Basket
+                            {% with basket_count=user.customuser.customer.basket.all|length %}
+                                {% if basket_count %}<span class="basket-count">{{ basket_count }}</span>{% endif %}
+                            {% endwith %}
+                        </a>
                     {% endif %}
-                
-                {% if user.is_staff %}| you are a staff {% endif %}
-                
-                {% if not user.customuser.seller.markets.all and user.customuser.seller %}
-                    | You are not currently in any markets either request a supervisor to add to their market
-                    or <a href="{% url 'users:create_market' %}">create a market</a>
+                    <a href="{% url 'users:logout' %}" class="btn btn-ghost btn-sm">Logout</a>
+                {% else %}
+                    <a href="{% url 'users:login' %}" class="btn btn-ghost btn-sm">Login</a>
+                    <a href="{% url 'users:signup' %}" class="btn btn-primary btn-sm">Sign up</a>
                 {% endif %}
-                
-                <li><a href="{%url 'users:logout'%}">logout</a></li>
-                {% if user.customuser.seller %}
-                <li><a href="{% url 'users:seller_pf' %}">Profile</a></li>
-                <li><a href="{% url 'users:create_market' %}">Create a market</a></li>
-                {% endif %}
-                {% endif %}
-                {% if not user.is_authenticated %}
-                <li><a href="{% url 'users:signup' %}">Register</a></li>
-                <li><a href="{% url 'users:login' %}">Login</a></li>
-                {% endif %}
-                <li><a href="{% url 'main' %}">Home</a></li>
-                {% if user.customuser.customer %}
-                <li><a href="{% url 'users:customer_pf' %}">Profile</a> | Basket items: {{user.customuser.customer.basket.all|length}} {% if user.customuser.customer.basket.all %}<a href="{% url 'markets:place_order' %}">Place Order</a> {% endif %}</li>
-                {% endif %}
-                
-            </ul>
-            <form method="POST" action="{% url 'markets:search' %}" >
-                {% csrf_token %}
-                <lable for="search_index">Search Through Markets:</lable>
-                <input id="search_index" type="text" name="keyword" placeholder="Search">
-                <input type="submit" value="Search">
-            </form>
-            {% endblock sidebar%}
-        </div>
-
-        <div id="content">
-            <div id="main-messages">
-                {% block messages %}
-                {% if messages %}
-                <ul class="messages">
-                    {% for message in messages %}
-                    <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
-                    {% endfor %}
-                </ul>
-                {% endif %}            
-                {% endblock %}
             </div>
-            {% block content %} {% endblock %}
-        </div>
+        </header>
 
-    </body>
+        <aside class="sidebar" aria-label="Site navigation">
+            {% block sidebar %}
+            {% if user.is_authenticated %}
+            <div class="sidebar-section">
+                <span class="sidebar-label">Account</span>
+                <div class="user-badge">
+                    <span class="user-avatar" aria-hidden="true">{{ user.username|make_list|first|upper }}</span>
+                    <div class="user-meta">
+                        <strong>{{ user.username }}</strong>
+                        <span class="user-role">
+                            {% if user.customuser.customer %}Customer
+                            {% elif user.customuser.seller %}Seller
+                            {% else %}No role selected{% endif %}
+                            {% if user.is_staff %} · Staff{% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+            {% endif %}
+
+            <nav class="sidebar-section" aria-label="Main menu">
+                <span class="sidebar-label">Menu</span>
+                <ul class="nav-list">
+                    <li><a href="{% url 'main' %}" {% if request.resolver_match.url_name == 'main' %}aria-current="page"{% endif %}>Home</a></li>
+                    {% if user.is_authenticated %}
+                        {% if user.customuser.customer %}
+                        <li><a href="{% url 'users:customer_pf' %}">Profile</a></li>
+                        {% if user.customuser.customer.basket.all %}
+                        <li><a href="{% url 'markets:place_order' %}">Place order</a></li>
+                        {% endif %}
+                        {% elif user.customuser.seller %}
+                        <li><a href="{% url 'users:seller_pf' %}">Profile</a></li>
+                        <li><a href="{% url 'users:create_market' %}">Create market</a></li>
+                        {% else %}
+                        <li><a href="{% url 'users:customer_sign_up' %}">Join as customer</a></li>
+                        <li><a href="{% url 'users:seller_sign_up' %}">Join as seller</a></li>
+                        {% endif %}
+                    {% else %}
+                    <li><a href="{% url 'users:login' %}">Login</a></li>
+                    <li><a href="{% url 'users:signup' %}">Register</a></li>
+                    {% endif %}
+                </ul>
+            </nav>
+
+            {% if user.is_authenticated and user.customuser.seller and not user.customuser.seller.markets.all %}
+            <div class="sidebar-section">
+                <p class="user-role" style="margin: 0 0 0.75rem;">Not assigned to any market yet.</p>
+                <a href="{% url 'users:create_market' %}" class="btn btn-primary btn-sm" style="width: 100%;">Create a market</a>
+            </div>
+            {% endif %}
+
+            <div class="sidebar-section">
+                <span class="sidebar-label">Search</span>
+                <form method="POST" action="{% url 'markets:search' %}" class="search-form">
+                    {% csrf_token %}
+                    <label for="search_index">Find markets</label>
+                    <div class="input-group">
+                        <input id="search_index" type="text" name="keyword" placeholder="e.g. espresso, roast…" autocomplete="off">
+                        <button type="submit" class="btn btn-primary btn-sm">Go</button>
+                    </div>
+                </form>
+            </div>
+            {% endblock sidebar %}
+        </aside>
+
+        <main id="main-content" class="main-content">
+            {% block messages %}
+            {% if messages %}
+            <ul class="messages" aria-live="polite">
+                {% for message in messages %}
+                <li{% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+            {% endblock %}
+            {% block content %}{% endblock %}
+        </main>
+    </div>
+</body>
 </html>
