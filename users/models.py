@@ -4,11 +4,28 @@ from django.core.validators import MaxValueValidator, MinValueValidator
 
 # Create your models here.
 
+
+class CustomUserManager(models.Manager):
+    def ensure_for_user(self, user):
+        """Return the marketplace profile for an authenticated Django user."""
+        profile, _ = self.get_or_create(
+            user=user,
+            defaults={
+                "phone_number": "",
+                "id_number": "",
+                "date_joined": user.date_joined,
+            },
+        )
+        return profile
+
+
 class CustomUser(models.Model):
     user = models.OneToOneField(User,on_delete=models.CASCADE)
     phone_number = models.CharField(max_length=11)
     id_number = models.CharField(max_length=10)
     date_joined = models.DateTimeField()
+    objects = CustomUserManager()
+
     def __str__(self):
         return str(self.user.username)
 
