@@ -20,8 +20,11 @@ class MarketMainPage(View):
             #anonymous
             payload["anonymous"] = True
         else:
-            user = CustomUser.objects.get(user=request.user)
-            if  Seller.objects.filter(user=user).exists():
+            user = CustomUser.objects.filter(user=request.user).first()
+            if user is None:
+                # Django admin accounts do not automatically have an app profile.
+                payload["no_role"] = True
+            elif Seller.objects.filter(user=user).exists():
                 seller = Seller.objects.get(user=user)
                 if market in seller.markets.all():
                     #seller of the market

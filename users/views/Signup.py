@@ -44,8 +44,8 @@ class SignupView(View):
 
 class SellerSignUpView(LoginRequiredMixin,View):
     def get(self,request):
-        seller = Seller(user=CustomUser.objects.get(user=request.user))
-        seller.save()
+        user = CustomUser.objects.ensure_for_user(request.user)
+        Seller.objects.get_or_create(user=user)
         messages.success(request,"Seller registration completed!")
         return redirect('main')
 
@@ -57,7 +57,7 @@ class CustomerSignUpView(LoginRequiredMixin,View):
         form = RoleMarket.RoleCustomer(request.POST)
         if form.is_valid():
             form = form.cleaned_data
-            user = CustomUser.objects.get(user=request.user)
+            user = CustomUser.objects.ensure_for_user(request.user)
             if Seller.objects.filter(user=user):
                 error = "You're recognized as seller, you can't be customer using this account!"
                 form = RoleMarket.RoleCustomer(request.POST)
@@ -123,6 +123,5 @@ class UpdateUser(LoginRequiredMixin,View):
                 return redirect("main")
         else:
             return render(request,"users/updateUser.html",{"form":form})
-
 
 

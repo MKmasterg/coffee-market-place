@@ -8,11 +8,11 @@ from ..models import CustomUser,Customer,Seller,Market
 
 class CreateMarket(LoginRequiredMixin,View):
     def get(self,request):
-        user = CustomUser.objects.get(user=request.user)
-        if Seller.objects.filter(user=user):
+        user = CustomUser.objects.filter(user=request.user).first()
+        if user is not None and Seller.objects.filter(user=user).exists():
             form = RoleMarket.MarketForm()
             return render(request,'users/createMarket.html',{'form':form})
-        elif Customer.objects.filter(user=user) :
+        elif user is not None and Customer.objects.filter(user=user).exists():
             message = "You are a customer! you must be a seller in order to create a market!"
             messages.error(request,message)
             return render(request,'main.html')
@@ -22,8 +22,8 @@ class CreateMarket(LoginRequiredMixin,View):
             messages.error(request,message)
             return render(request,'users/createMarket.html',{"form":form})
     def post(self,request):
-        user = CustomUser.objects.get(user=request.user)
-        if Seller.objects.filter(user=user):
+        user = CustomUser.objects.ensure_for_user(request.user)
+        if Seller.objects.filter(user=user).exists():
             seller = Seller.objects.get(user=user)
             form = RoleMarket.MarketForm(request.POST)
             if form.is_valid():
@@ -42,7 +42,7 @@ class CreateMarket(LoginRequiredMixin,View):
             else:
                 form = RoleMarket.MarketForm(request.POST)
                 return render(request,'users/createMarket.html',{'form':form})
-        elif Customer.objects.filter(user=user) :
+        elif Customer.objects.filter(user=user).exists():
             message = "You are a customer! you must be a seller in order to create a market!"
             messages.error(request,message)
             return redirect("main")
